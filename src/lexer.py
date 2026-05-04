@@ -1,5 +1,5 @@
 """
-Fortran 77 Lexer — ply.lex
+Fortran 77 Lexer ply.lex
 """
 
 import ply.lex as lex
