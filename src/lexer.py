@@ -1,5 +1,5 @@
 """
-Fortran 77 Lexer ply.lex
+Fortran 77 Lexer (ply.lex)
 """
 
 import ply.lex as lex
@@ -27,20 +27,11 @@ reserved = {
     'CALL'       : 'CALL',
     'SUBROUTINE' : 'SUBROUTINE',
     'FUNCTION'   : 'FUNCTION',
-    'COMMON'     : 'COMMON',
-    'DIMENSION'  : 'DIMENSION',
-    'DATA'       : 'DATA',
-    'PARAMETER'  : 'PARAMETER',
-    'WRITE'      : 'WRITE',
-    'FORMAT'     : 'FORMAT',
-    'IMPLICIT'   : 'IMPLICIT',
-    'NONE'       : 'NONE',
     'MOD'        : 'MOD',
     'ABS'        : 'ABS',
     'SQRT'       : 'SQRT',
     'INT'        : 'INT',
     'FLOAT'      : 'FLOAT',
-    'DBLE'       : 'DBLE',
     'MAX'        : 'MAX',
     'MIN'        : 'MIN',
     'IABS'       : 'IABS',
@@ -54,9 +45,8 @@ tokens = list(reserved.values()) + [
     'FLOAT_LIT',    
     'STR_LIT',    
     'BOOL_LIT',    
-    # Identificadores
+    
     'ID',
-    # Label
     'LABEL',
     # Operadores relacionais
     'EQ', 'NE', 'LT', 'LE', 'GT', 'GE',
@@ -64,8 +54,10 @@ tokens = list(reserved.values()) + [
     'AND', 'OR', 'NOT',
     # Operadores aritméticos
     'PLUS', 'MINUS', 'DIVIDE', 'POWER',
+    'CONCAT',
     # Pontuação
     'LPAREN', 'RPAREN', 'COMMA', 'EQUALS', 'COLON',
+    
     'STAR',
     'NEWLINE',
 ]
@@ -237,15 +229,30 @@ def tokenize(source: str, fixed_form: bool = True, debug: bool = False):
         if tok is None:
             break
         toks.append(tok)
-    return toks
+    return toks, []
 
 
 if __name__ == '__main__':
     import sys
-    src = open(sys.argv[1]).read() if len(sys.argv) > 1 else """\
-      PROGRAM HELLO
-      PRINT *, 'Ola, Mundo!'
+
+    # Uso: python3 lexer.py [ficheiro.f77]
+    # Se não for dado ficheiro, usa um programa de exemplo
+    if len(sys.argv) > 1:
+        src = open(sys.argv[1]).read()
+    else:
+        src = """\
+      PROGRAM EXEMPLO
+      INTEGER N, I
+      READ *, N
+      DO 10 I = 1, N
+      PRINT *, I
+  10  CONTINUE
       END
     """
-    for tok in tokenize(src):
-        print(tok)
+        print("(Sem ficheiro fornecido... a usar programa de exemplo)\n")
+
+    tokens, _ = tokenize(src, fixed_form=True)
+    print(f"{'Tipo':<15} {'Valor':<20} {'Linha'}")
+    print("-" * 45)
+    for tok in tokens:
+        print(f"{tok.type:<15} {str(tok.value):<20} {tok.lineno}")
